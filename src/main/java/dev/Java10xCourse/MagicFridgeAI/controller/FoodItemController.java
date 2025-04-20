@@ -1,5 +1,6 @@
 package dev.Java10xCourse.MagicFridgeAI.controller;
 
+import dev.Java10xCourse.MagicFridgeAI.controller.Mapper.FoodItemMapper;
 import dev.Java10xCourse.MagicFridgeAI.model.FoodItem;
 import dev.Java10xCourse.MagicFridgeAI.service.FoodItemService;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,11 @@ public class FoodItemController {
         }
 
         List<FoodItemDTO> foodItemDTOs = foods.stream()
-                .map(foodItem -> new FoodItemDTO(foodItem.getId(), foodItem.getName(), foodItem.getCategory(), foodItem.getQuantity(), foodItem.getValidity()))
+                .map(foodItem -> new FoodItemDTO(foodItem.getId(),
+                        foodItem.getName(),
+                        foodItem.getCategory(),
+                        foodItem.getQuantity(),
+                        foodItem.getValidity()))
                 .toList();
         return ResponseEntity.status(HttpStatus.OK).body(foodItemDTOs);
     }
@@ -38,7 +43,7 @@ public class FoodItemController {
     public Optional<ResponseEntity<FoodItemDTO>> getById(@PathVariable Long id){
         Optional<FoodItem> item= service.findById(id);
         return Optional.of(item.map(foodItem -> {
-            FoodItemDTO foodItemDTO = new FoodItemDTO(foodItem.getId(), foodItem.getName(), foodItem.getCategory(), foodItem.getQuantity(), foodItem.getValidity());
+            FoodItemDTO foodItemDTO = FoodItemMapper.toDTO(foodItem);
             return ResponseEntity.status(HttpStatus.OK).body(foodItemDTO);
         }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build()));
     }
@@ -46,17 +51,17 @@ public class FoodItemController {
     @PostMapping()
     public ResponseEntity<?> saveFoodItem(@RequestBody FoodItemDTO foodItemDTO){
         try {
-            FoodItem foodItem = new FoodItem(foodItemDTO.id(), foodItemDTO.name(), foodItemDTO.category(), foodItemDTO.quantity(), foodItemDTO.validity());
+            FoodItem foodItem = FoodItemMapper.toEntity(foodItemDTO);
             FoodItem savedFoodItem = service.save(foodItem);
-            FoodItemDTO savedFoodItemDTO = new FoodItemDTO(savedFoodItem.getId(), savedFoodItem.getName(), savedFoodItem.getCategory(), savedFoodItem.getQuantity(), savedFoodItem.getValidity());
+            FoodItemDTO savedFoodItemDTO = FoodItemMapper.toDTO(savedFoodItem);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedFoodItemDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao salvar!");
         }
     }
 
-    @DeleteMapping()
-    public ResponseEntity<?> deleteFoodItem(@RequestParam Long id){
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteFoodItem(@PathVariable Long id){
         try {
             Optional<FoodItem> item = service.findById(id);
             if (item.isEmpty()) {
@@ -70,5 +75,18 @@ public class FoodItemController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao deletar!");
         }
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateFoodItem(@PathVariable Long id, @RequestBody FoodItemDTO foodItemDTO){
+        try {
+            FoodItem foodItem = FoodItemMapper.toEntity(foodItemDTO);
+            FoodItem updatedFoodItem = service.updateById(foodItem, id);
+            FoodItemDTO updatedFoodItemDTO = FoodItemMapper.toDTO(updatedFoodItem);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedFoodItemDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao atualizar!");
+        }
+    }
+
 
 }
