@@ -19,6 +19,7 @@ public class FoodItemService {
     public FoodItem save(FoodItem item){
         return foodItemRepository.save(item);
     }
+
     public List<FoodItem> findAll(){
         return foodItemRepository.findAll();
     }
@@ -26,6 +27,7 @@ public class FoodItemService {
     public Optional<FoodItem> findById(Long id){
         return foodItemRepository.findById(id);
     }
+
     public void deleteById(Long id){
         foodItemRepository.deleteById(id);
     }
