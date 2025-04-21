@@ -1,5 +1,6 @@
 package dev.Java10xCourse.MagicFridgeAI.service;
 
+import dev.Java10xCourse.MagicFridgeAI.exceptions.FoodItemNotFoundException;
 import dev.Java10xCourse.MagicFridgeAI.model.FoodItem;
 import dev.Java10xCourse.MagicFridgeAI.repository.FoodItemRepository;
 import org.springframework.stereotype.Service;
@@ -32,13 +33,16 @@ public class FoodItemService {
         foodItemRepository.deleteById(id);
     }
 
-    public FoodItem updateById(FoodItem item, Long id){
-        FoodItem foodItem = foodItemRepository.findById(id).orElseThrow();
-        foodItem.setName(item.getName());
-        foodItem.setCategory(item.getCategory());
-        foodItem.setQuantity(item.getQuantity());
-        foodItem.setValidity(item.getValidity());
-        return foodItemRepository.save(foodItem);
+    public Optional<FoodItem> updateById(FoodItem item, Long id){
+        FoodItem existingItem = foodItemRepository.findById(id)
+                .orElseThrow(() -> new FoodItemNotFoundException(id));
+
+        existingItem.setName(item.getName());
+        existingItem.setCategory(item.getCategory());
+        existingItem.setQuantity(item.getQuantity());
+        existingItem.setValidity(item.getValidity());
+
+        return Optional.of(foodItemRepository.save(existingItem));
     }
 
 }

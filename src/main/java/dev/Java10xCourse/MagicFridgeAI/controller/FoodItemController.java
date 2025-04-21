@@ -1,6 +1,7 @@
 package dev.Java10xCourse.MagicFridgeAI.controller;
 
 import dev.Java10xCourse.MagicFridgeAI.controller.Mapper.FoodItemMapper;
+import dev.Java10xCourse.MagicFridgeAI.exceptions.FoodItemNotFoundException;
 import dev.Java10xCourse.MagicFridgeAI.model.FoodItem;
 import dev.Java10xCourse.MagicFridgeAI.service.FoodItemService;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import dev.Java10xCourse.MagicFridgeAI.controller.DTO.FoodItemDTO;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/food")
@@ -30,12 +32,8 @@ public class FoodItemController {
         }
 
         List<FoodItemDTO> foodItemDTOs = foods.stream()
-                .map(foodItem -> new FoodItemDTO(foodItem.getId(),
-                        foodItem.getName(),
-                        foodItem.getCategory(),
-                        foodItem.getQuantity(),
-                        foodItem.getValidity()))
-                .toList();
+                .map(FoodItemMapper::toDTO)
+                .collect(Collectors.toList());
         return ResponseEntity.status(HttpStatus.OK).body(foodItemDTOs);
     }
 
@@ -80,13 +78,18 @@ public class FoodItemController {
     public ResponseEntity<?> updateFoodItem(@PathVariable Long id, @RequestBody FoodItemDTO foodItemDTO){
         try {
             FoodItem foodItem = FoodItemMapper.toEntity(foodItemDTO);
-            FoodItem updatedFoodItem = service.updateById(foodItem, id);
-            FoodItemDTO updatedFoodItemDTO = FoodItemMapper.toDTO(updatedFoodItem);
-            return ResponseEntity.status(HttpStatus.OK).body(updatedFoodItemDTO);
+            Optional<FoodItem> updatedFoodItemOpt = service.updateById(foodItem, id);
+
+            FoodItemDTO updatedFoodItemDTO = FoodItemMapper.toDTO(updatedFoodItemOpt.get());
+            return ResponseEntity.ok(updatedFoodItemDTO);
+
+        } catch (FoodItemNotFoundException e) {
+            throw e;
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao atualizar!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao atualizar: " + e.getMessage());
         }
     }
+
 
 
 }
