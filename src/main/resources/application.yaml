@@ -21,3 +21,8 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
     validate-on-migrate: true
+
+openai:
+  api:
+    url: https://api.openai.com/v1/chat/completions
+    key: ${OPENAI_API_KEY}
