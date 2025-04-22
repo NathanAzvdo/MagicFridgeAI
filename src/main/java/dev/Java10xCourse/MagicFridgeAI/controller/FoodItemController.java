@@ -38,12 +38,13 @@ public class FoodItemController {
     }
 
     @GetMapping("/{id}")
-    public Optional<ResponseEntity<FoodItemDTO>> getById(@PathVariable Long id){
-        Optional<FoodItem> item= service.findById(id);
-        return Optional.of(item.map(foodItem -> {
-            FoodItemDTO foodItemDTO = FoodItemMapper.toDTO(foodItem);
-            return ResponseEntity.status(HttpStatus.OK).body(foodItemDTO);
-        }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build()));
+    public ResponseEntity<FoodItemDTO> getById(@PathVariable Long id){
+        return service.findById(id)
+                .map(foodItem -> {
+                    FoodItemDTO foodItemDTO = FoodItemMapper.toDTO(foodItem);
+                    return ResponseEntity.ok(foodItemDTO);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping()
@@ -63,14 +64,14 @@ public class FoodItemController {
         try {
             Optional<FoodItem> item = service.findById(id);
             if (item.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item não encontrado!");
+                return ResponseEntity.notFound().build();
             }
             else{
                 service.deleteById(id);
-                return ResponseEntity.status(HttpStatus.OK).body("Item deletado com sucesso!");
+                return ResponseEntity.ok().body("Item deletado com sucesso!");
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao deletar!");
+            return ResponseEntity.badRequest().body("Erro ao deletar!");
         }
     }
 

@@ -1,4 +1,3 @@
-
 CREATE TYPE food_item_categoria AS ENUM (
     'FRUTAS',
     'VEGETAIS',
@@ -17,7 +16,6 @@ CREATE TYPE food_item_categoria AS ENUM (
     'MARISCOS'
 );
 
--- Criação da tabela food_items
 CREATE TABLE food_items (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
