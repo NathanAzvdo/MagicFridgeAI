@@ -33,14 +33,25 @@ public class FoodItemService {
         foodItemRepository.deleteById(id);
     }
 
-    public Optional<FoodItem> updateById(FoodItem item, Long id){
+    public Optional<FoodItem> updateById(FoodItem item, Long id) {
         FoodItem existingItem = foodItemRepository.findById(id)
                 .orElseThrow(() -> new FoodItemNotFoundException(id));
 
-        existingItem.setName(item.getName());
-        existingItem.setCategory(item.getCategory());
-        existingItem.setQuantity(item.getQuantity());
-        existingItem.setValidity(item.getValidity());
+        if (item.getName() != null) {
+            existingItem.setName(item.getName());
+        }
+
+        if (item.getCategory() != null) {
+            existingItem.setCategory(item.getCategory());
+        }
+
+        if (item.getQuantity() != null) {
+            existingItem.setQuantity(item.getQuantity());
+        }
+
+        if (item.getValidity() != null) {
+            existingItem.setValidity(item.getValidity());
+        }
 
         return Optional.of(foodItemRepository.save(existingItem));
     }

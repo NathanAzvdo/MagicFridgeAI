@@ -25,10 +25,10 @@ public class FoodItemController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<FoodItemDTO>> getAll(){
+    public ResponseEntity<?> getAll(){
         List<FoodItem> foods = service.findAll();
         if(foods.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não há registros!");
         }
 
         List<FoodItemDTO> foodItemDTOs = foods.stream()
