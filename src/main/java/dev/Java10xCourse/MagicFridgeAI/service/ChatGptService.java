@@ -1,5 +1,6 @@
 package dev.Java10xCourse.MagicFridgeAI.service;
 
+import dev.Java10xCourse.MagicFridgeAI.model.FoodItem;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -16,10 +17,13 @@ public class ChatGptService {
         this.webClient = webClient;
     }
 
+    public Mono<String> generateRecipe(List<FoodItem> foodItems) {
+        String items = foodItems.stream()
+                .map(item -> item.getName() + " (" + item.getQuantity() + ")")
+                .reduce((first, second) -> first + ", " + second)
+                .orElse("Nenhum ingrediente disponível.");
 
-
-    public Mono<String> generateRecipe() {
-        String prompt = "Me sugira receitas simples com ingredientes comuns";
+        String prompt = "Baseado no meu banco de dados faça uma receita. Caso não tenha itens, avise que precisa fazer compras. segue os itens:"+ items;
 
         Map<String, Object> requestBody = Map.of(
                 "model", "gpt-4.1",
