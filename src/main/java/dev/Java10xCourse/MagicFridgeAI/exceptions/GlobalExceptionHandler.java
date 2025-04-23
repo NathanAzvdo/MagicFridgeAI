@@ -1,6 +1,5 @@
-package dev.Java10xCourse.MagicFridgeAI.controller;
+package dev.Java10xCourse.MagicFridgeAI.exceptions;
 
-import dev.Java10xCourse.MagicFridgeAI.exceptions.FoodItemNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
